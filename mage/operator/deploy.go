@@ -101,6 +101,14 @@ func DeployToECR() {
 	retagAndPush(strings.Split(tags, "|"), ecrRepo)
 }
 
+func ArtifactoryDockerLogin() {
+	artifactoryRepo := mageutil.RequireEnv(envArtRepo)
+	user := mageutil.RequireEnv(envArtifactoryUser)
+	pw := mageutil.RequireEnv(envArtifactoryPw)
+	dockerutil.Login(rootBuildDir, user, pw, artifactoryRepo).
+		WithCfg(rootBuildDir).ExecVPanic()
+}
+
 // Deploy operator image to artifactory.
 //
 // Most of our internal end-to-end tests rely on operator container images
@@ -112,12 +120,9 @@ func DeployToECR() {
 // MO_ART_PSW - artifactory password/api key
 // MO_TAGS - pipe-delimited docker tags to retag/push to Artifactory
 func DeployToArtifactory() {
-	artifactoryRepo := mageutil.RequireEnv(envArtRepo)
-	user := mageutil.RequireEnv(envArtifactoryUser)
-	pw := mageutil.RequireEnv(envArtifactoryPw)
-	dockerutil.Login(rootBuildDir, user, pw, artifactoryRepo).
-		WithCfg(rootBuildDir).ExecVPanic()
+	ArtifactoryDockerLogin()
 	tags := mageutil.RequireEnv(envTags)
+	artifactoryRepo := mageutil.RequireEnv(envArtRepo)
 	retagAndPush(strings.Split(tags, "|"), artifactoryRepo)
 }
 
@@ -128,10 +133,7 @@ func DeployToArtifactory() {
 // MO_GH_TOKEN - github token
 // MO_TAGS - pipe-delimited docker tags to retag/push to Github packages
 func DeployToGHPackages() {
-	user := mageutil.RequireEnv(envGHUser)
-	pw := mageutil.RequireEnv(envGHToken)
-	dockerutil.Login(rootBuildDir, user, pw, ghPackagesRegistry).
-		WithCfg(rootBuildDir).ExecVPanic()
+
 	tags := mageutil.RequireEnv(envTags)
 	retagAndPushForGH(strings.Split(tags, "|"))
 }

@@ -357,20 +357,11 @@ func calcVersionAndTags(version FullVersion, ubiBase bool) (string, []string) {
 	var versionedTag string
 	var tagsToPush []string
 
-	if ubiBase {
-		versionedTag = fmt.Sprintf("%s:%v-ubi", repoPath, version)
-		tagsToPush = []string{
-			versionedTag,
-			fmt.Sprintf("%s:%s-ubi", repoPath, version.Hash),
-			fmt.Sprintf("%s:latest-ubi", repoPath),
-		}
-	} else {
-		versionedTag = fmt.Sprintf("%s:%v", repoPath, version)
-		tagsToPush = []string{
-			versionedTag,
-			fmt.Sprintf("%s:%s", repoPath, version.Hash),
-			fmt.Sprintf("%s:latest", repoPath),
-		}
+	versionedTag = fmt.Sprintf("%s:%v", repoPath, version)
+	tagsToPush = []string{
+		versionedTag,
+		//fmt.Sprintf("%s:%s", repoPath, version.Hash),
+		fmt.Sprintf("%s:latest", repoPath),
 	}
 
 	return versionedTag, tagsToPush
